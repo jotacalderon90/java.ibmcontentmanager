@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Reporte</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
+		<style>
+			#chartContainer{
+				height:400px;
+			}
+		</style>
+	</head>
+	<body data-ng-app="myApp" data-ng-controller="myController as main">
+		<div class="container">
+			<h1>Reportería</h1>
+			<hr>
+			<!-- GRAFICO -->
+			<div class="panel panel-success">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-md-6">
+							<!-- SELECCION DE AÑO -->
+							<div class="btn-group">
+								<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									Año: {{main.entity.year}} <span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu">
+									<li data-ng-repeat="y in main.entity.years"><a data-ng-click="main.entity.year = y">{{y}}</a></li>
+								</ul>
+							</div>
+							<!-- SELECCION DE MES -->
+							<div class="btn-group">
+								<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									Mes: {{main.entity.month.label}} <span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu">
+									<li data-ng-repeat="m in main.entity.months"><a data-ng-click="main.entity.month = m">{{m.label}}</a></li>
+								</ul>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<button class="btn btn-xs btn-success pull-right" data-ng-click="main.entity.report()">
+								<span class="fa fa-refresh"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="panel-body">
+					<div id="chartContainer"></div>
+					<hr>
+					<div class="row">
+						<div class="col-md-6">
+							<table class="table table-condensed">
+								<thead>
+									<tr>
+										<th colspan="2">Desglose</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr data-ng-repeat="leyend in main.entity.leyend">
+										<td>{{leyend.label}}</td>
+										<td><span class="badge pull-right"><span data-ng-show="leyend.load">{{leyend.y | number}}</span> <span class="fa fa-spinner fa-spin" data-ng-show="!leyend.load"></span></span></td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td>Total</td>
+										<td><span class="badge pull-right">{{main.entity.totalreport | number}}</span></td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+						<div class="col-md-6">
+							<table class="table table-condensed" data-ng-show="main.entity.resume.show">
+								<thead>
+									<tr>
+										<th colspan="3">Resumen de inserciones</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Media</td>
+										<td></td>
+										<td><span class="badge pull-right">{{main.entity.resume.media|number}}</span></td>
+									</tr>
+									<tr>
+										<td>Mínima</td>
+										<td>{{main.entity.resume.min.label}}</td>
+										<td><span class="badge pull-right">{{main.entity.resume.min.total|number}}</span></td>
+									</tr>
+									<tr>
+										<td>Máxima</td>
+										<td>{{main.entity.resume.max.label}}</td>
+										<td><span class="badge pull-right">{{main.entity.resume.max.total|number}}</span></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+			
+		<!-- PRINCIPAL JAVASCRIPT PLUG -->
+		<script src="asset/plug/js/jquery.js"></script>
+		<script src="asset/plug/js/angular.min.js"></script>
+		<script src="asset/plug/js/bootstrap.min.js"></script>
+		<script src="asset/plug/js/jquery.canvasjs.min.js"></script>
+		<script src="asset/plug/js/jota.transcend.js"></script>
+		
+		<!-- MAIN JS -->
+		<script>
+			var entityId = "XXXYTEMTYPEXXX";
+		</script>
+		<script src="asset/js/report.js"></script>
+	</body>
+</html>

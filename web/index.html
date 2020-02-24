@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es" data-ng-app="angularApp">
+	<head>
+		<!--[if IE]>
+			<meta http-equiv="refresh" content="0; url=https://es.answers.yahoo.com/question/index?qid=20081226192739AAd7Z0g" />
+		<![endif]-->
+		
+		<!-- METAS -->
+		<meta charset="utf-8" />
+		<meta name="description" content="Administrador de content manager" />
+		<meta name="author" content="Jhonatan Calderon, www.jotacalderon.cl, contacto@jotacalderon.cl" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		
+		<!-- TITLE -->
+		<title>Content Manager</title>
+		
+		<!-- PRINCIPAL STYLE -->
+                <link href="asset/plug/css/bootstrap.min.css" rel="stylesheet" />
+                <link href="asset/plug/css/font-awesome.min.css" rel="stylesheet" />
+		<!-- TREE VIEW -->
+                <link href="asset/plug/treeview/jquery.treeview.css" rel="stylesheet" />
+		<!-- OWNER STYLER -->
+                <link href="asset/css/dashboard.css" rel="stylesheet" />
+		<link href="asset/css/index.css" rel="stylesheet" />
+	</head>
+	<body data-ng-controller="mainController as main">
+		
+		<!-- HEADER -->
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<form class="navbar-form navbar-left">
+						<div class="form-group">
+							<input type="text" class="form-control input-sm" placeholder="Visual Name" data-ng-model="main.data.others.newconnection.name"/>
+							<input type="text" class="form-control input-sm" placeholder="Server" data-ng-model="main.data.others.newconnection.server"/>
+							<input type="text" class="form-control input-sm" placeholder="User" data-ng-model="main.data.others.newconnection.user"/>
+							<input type="password" class="form-control input-sm" placeholder="Password" data-ng-model="main.data.others.newconnection.pwd"/>
+							<input type="text" class="form-control input-sm" placeholder="Schema" data-ng-model="main.data.others.newconnection.schema"/>
+							<input type="text" class="form-control input-sm" placeholder="env path" data-ng-model="main.data.others.newconnection.envpath"/>
+							<input type="text" class="form-control input-sm" placeholder="srvs path" data-ng-model="main.data.others.newconnection.srvspath"/>
+						</div>
+						<button type="button" data-ng-click="main.methods.getConnection(main)" class="btn btn-default btn-xs">Conectar</button>
+					</form>      		
+				</div>
+			</div>
+		</nav>
+		
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-3 col-md-3 sidebar">
+				
+					<!-- MENU CONTENT MANAGER -->
+					<!-------------------------->
+					<div data-angular-treeview="true"
+						 data-tree-model="main.data.connections"
+						 data-node-id="contentconnections"
+						 data-node-label="conf.name"
+						 data-node-children="entities">
+					</div>
+					<hr>
+					<div class="text-left">
+						<!-- Single button -->
+						<div class="btn-group">
+						  <button type="button" class="btn btn-info btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<i class="fa fa-file"></i> Archivos <span class="caret"></span>
+						  </button>
+						  <ul class="dropdown-menu">
+							<li data-ng-show="main.data.connections.length>0">
+								<a href="#" data-ng-click="main.methods.export(main.data.connections,'outline')" >Exportar Conecciones</a>
+							</li>
+							<li>
+								<a href="#" data-ng-click="main.methods.openloadConnections()" data-toggle="modal" data-target="#myModal">Importar Conecciones</a>
+							</li>
+							<li>
+								<a href="#" data-ng-click="main.methods.openExportProperty()"data-toggle="modal" data-target="#myModal">Exportar Configuración Cliente</a>
+							</li>
+						  </ul>
+						</div>
+					</div>
+
+				</div>
+				<div class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main">
+				
+					<!-- CONTENIDO PRINCIPAL -->
+					<!------------------------->
+					<input type="hidden" ng-model="currentNode"/>
+					<button class="btn btn-xs btn-success" data-ng-click="main.methods.selectItemType()" data-ng-show="main.data.connections.length>0">Cargar datos de la entidad seleccionada</button>
+					<small class="text-danger">{{log_entityselected}}</small>
+					<hr>
+
+					<div data-ng-show="schema_loaded">
+
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="panel panel-success">
+									<div class="panel-heading panel-graphic">
+										<h3 class="panel-title">Reporte&nbsp;&nbsp;</h3>
+										<select data-ng-model="main.data.others.graphic.year"  data-ng-options="agno for agno in main.data.others.graphic.years"></select>
+										<select data-ng-model="main.data.others.graphic.month" data-ng-options="item.label for item in main.data.others.graphic.months track by item.id"></select>
+										<select data-ng-model="main.data.others.graphic.field" data-ng-options="field.label for field in main.data.others.graphic.fields"></select>
+										<button type="button" class="btn btn-warning btn-xs pull-right" data-ng-click="main.methods.loadGraphic()">
+											<span class="glyphicon glyphicon-search" aria-hidden="true"></span> Refrescar
+										</button>
+									</div>
+									<div class="panel-body">
+										<div class="row">
+											<div class="col-sm-9">
+												<div id="chartContainer"></div>
+											</div>
+											<div class="col-sm-3">
+												<ul class="list-group">
+													<li class="list-group-item" data-ng-repeat="option in main.data.others.graphic.request.data">
+														{{main.methods.composeDetail(option.x)}}
+														<span class="badge">{{option.y | number}}</span>
+													</li>
+													<li class="list-group-item"><strong>Total</strong><span class="badge">{{main.data.others.graphic.request.totalrow | number}}</span></li>
+												</ul>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<hr>
+						
+						<div class="row">
+							<div class="col-sm-4">
+								<div class="panel panel-info">
+									<div class="panel-heading">
+										<h3 class="panel-title">Esquema</h3>
+									</div>
+									<div class="panel-body">
+										<ul class="list-group">
+											<li class="list-group-item" data-ng-repeat="field in main.data.schema">
+												{{field.label}}
+												<span class="pull-right">
+													<input type="checkbox" data-ng-model="field.getting" title="Mostrar {{field.name}}"/>
+												</span>
+												<span class="pull-right">
+													<input type="checkbox" data-ng-model="field.filtering" title="Filtrar datos por {{field.name}}"/>
+												</span>
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-8">
+								<div class="panel panel-success" data-ng-show="main.methods.isFiltering()">
+									<div class="panel-heading">
+										<h3 class="panel-title">Filtrar</h3>
+									</div>
+									<div class="panel-body">
+										<form>
+											<div class="row form-group" data-ng-repeat="field in main.data.schema" data-ng-show="field.filtering">
+												<div class="col-sm-3">
+													<label for="{{field.name}}" class="col-sm-3 control-label">{{field.label}}</label>
+												</div>
+												<div class="col-sm-3">
+													<select class="form-control input-sm" data-ng-model="field.operator">
+														<option data-ng-repeat="option in ['=','!=','>','>=','<','<=','between','like','in','contains']" value="{{option}}">{{option}}</option>
+													</select>
+												</div>
+												<div class="col-sm-3">
+													<input type="{{main.methods.getFieldType(field.type)}}" class="form-control input input-sm" data-ng-model="field.value1"/>
+													<small class="text-info" data-ng-show="field.operator=='like'">(%) wilcard for like</small>
+													<small class="text-info" data-ng-show="field.operator=='in'">(,) to separate</small>
+													<small class="text-info" data-ng-show="field.operator=='contains'">must be text-index</small>
+												</div>
+												<div class="col-sm-3">
+													<input type="{{main.methods.getFieldType(field.type)}}" class="form-control input input-sm" data-ng-model="field.value2" data-ng-show="field.operator=='between'"/>
+												</div>
+											</div>
+											<button type="button" data-ng-click="main.methods.getTotal()" class="btn btn-primary btn-xs">Filtrar</button>
+										</form>
+									</div>
+								</div>
+								<div class="panel panel-primary table-data">
+									<div class="panel-heading panel-data">
+										<h3 class="panel-title">Datos</h3>
+										
+										<button type="button" class="btn btn-warning btn-xs pull-right" data-ng-click="main.methods.getTotal()">
+											<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Refrescar
+										</button>
+										<span class="pull-right">&nbsp;</span>
+										<button type="button" class="btn btn-warning btn-xs pull-right" data-ng-click="main.methods.getData(0)">
+											<span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span> Descargar
+										</button>
+										
+									</div>
+									<div class="panel-body">
+										
+										<p class="text-info">
+											<small>Se han encontrado {{main.data.others.paginator.totalrows | number}} registros.</small>
+											<label><input type="checkbox" data-ng-model="txPreview"/> Preview</label>
+										</p>
+										<p>
+											<small class="text-info">
+												Ordenar por: 
+												<select data-ng-model="txFieldSort"  data-ng-options="schema.label for schema in main.data.schema"></select>
+												Ascendente: 
+												<input type="checkbox" data-ng-model="txTypeSort" />
+											</small>
+										</p>
+										<div class="table-responsive">
+											<table class="table table-condensed">
+												<thead>
+													<tr>
+														<th class="text-center">#</th>
+														<th class="text-center" data-ng-repeat="field in main.data.schema" data-ng-show="field.getting">
+															{{field.label}}
+														</th>
+														<th class="text-center" data-ng-show="txPreview"><i class="fa fa-file"></i></th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr data-ng-repeat="row in main.data.rows">
+														<td class="text-center">{{row.rowid}}</td>
+														<td class="text-center" data-ng-repeat="field in main.data.schema" data-ng-show="field.getting">{{row[field.name]}}</td>
+														<td class="text-center files" data-ng-show="txPreview">
+															<span data-ng-repeat="file in row.files">
+																<a data-toggle="modal" data-target="#myModal" data-ng-click="main.methods.clickFile(file.url)" data-ng-show="file.mimetype=='application/pdf'">
+																	<i class="fa fa-file-pdf-o"></i>
+																</a>
+																<a data-ng-href="{{file.url}}" target="_blank" data-ng-show="file.mimetype!='application/pdf'">
+																	<i class="fa fa-file"></i>
+																</a>
+															</span>
+														</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										<nav>
+											<ul class="pagination pagination-sm">
+												<li data-ng-show="main.methods.showIniPage()">
+													<a href data-ng-click="main.methods.setPage(1)" aria-label="Previous">
+														<span aria-hidden="true">&laquo;</span>
+													</a>
+												</li>
+												<li data-ng-repeat="i in main.methods.getPaginador()" data-ng-class="main.methods.getCurrentPage(i.indice)">
+													<a href data-ng-click="main.methods.setPage(i.indice)">
+														<span  aria-hidden="true">{{i.indice}}</span>
+													</a>
+												</li>
+												<li data-ng-show="main.methods.showLastPage()">
+													<a href data-ng-click="main.methods.setPage(main.data.others.paginator.totalpages)" aria-label="Next">
+														<span aria-hidden="true">&raquo;</span>
+													</a>
+												</li>
+											</ul>
+										</nav>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<hr>
+						
+						<div class="row">
+							<div class="col-sm-4">
+								<div class="panel panel-danger">
+									<div class="panel-heading">
+										<h3 class="panel-title">Eliminar registro</h3>
+									</div>
+									<div class="panel-body">		
+										<form method="post">
+											<div class="form-group">
+												<label for="componentid">ComponentID</label>
+												<input type="text" class="form-control" data-ng-model="main.data.others.componentid" >
+											</div>
+											<button type="button" class="btn btn-danger btn-xs" data-ng-click="main.methods.deleteRow()">Eliminar</button>
+										</form>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-8">
+								<div class="panel panel-warning">
+									<div class="panel-heading panel-insert">
+										<h3 class="panel-title">Metadata</h3>
+										<button type="button" class="btn btn-default btn-xs pull-right" data-ng-click="main.methods.setFormAction()">
+											<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+										</button>
+									</div>
+									<div class="panel-body">
+										<form data-ng-submit="main.methods.uploadDocument()">
+											
+											<!-- FOR EDIT -->
+											<div class="row form-group" data-ng-show="!main.data.others.formmetadata.insert">
+												<div class="col-sm-4">
+													<label class="control-label">COMPONENTID</label>
+												</div>
+												<div class="col-sm-7">
+													<input type="text" class="form-control input input-sm" data-ng-model="main.data.others.componentid">
+												</div>
+											</div>
+											
+											<!-- FOR INSERT -->
+											<div class="row form-group" data-ng-repeat="field in main.data.schema" data-ng-show="field.schema=='true'">
+												<div class="col-sm-4">
+													<label class="control-label">{{field.label}}</label>
+												</div>
+												<div class="col-sm-7">
+													<input class="form-control input input-sm" type="{{main.methods.getFieldType(field.type)}}" data-ng-model="field.value1">
+												</div>
+												<div class="col-sm-1">
+													<strong data-ng-show="{{field.nullable=='false'}}">(*) </strong>
+												</div>
+											</div>
+											
+											<!-- SUBMIT -->
+											<button type="submit" class="btn btn-primary btn-xs" >Subir</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+						<hr>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- LOGS MESSAGES -->
+		<div id="dvMessage">
+			<div class="alert alert-info" role="alert" data-ng-repeat="log in main.data.others.logs" data-ng-show="log.process || log.response.status=='error'">
+				<p><strong>{{log.msg}} <i class="fa fa-spinner fa-spin" data-ng-show="log.process"></i></strong></p>
+				<div data-ng-show="log.response.status=='error'">
+					<em class="text-danger">{{log.response.status}} {{log.response.desc}}, {{log.response.det}}</em>
+				</div>
+				<div data-ng-show="log.response.status=='success'">
+					<em class="text-success">{{log.response.status}}, {{log.response.desc}}</em>
+				</div>
+			</div>	
+		</div>
+		
+		<!-- MODAL -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-body" data-ng-show="modal=='filedocument'">
+		        <object id="iframeDoc" data="{{filedocument}}" type="application/pdf" >
+				alt : <a href="{{filedocument}}">{{filedocument}}</a>
+				</object>
+		      </div>
+		      <div class="modal-body" data-ng-show="modal=='loadconnections'">
+		        <textarea class="form-control" data-ng-model="txLoadconnections" placeholder="Pegue datos de conexion en formato json">
+				</textarea>
+				<hr>
+				<button type="button" class="btb btn-primary btn-xs" data-ng-click="main.methods.loadConnections()">Cargar</button>
+		      </div>
+		      <div class="modal-body" data-ng-show="modal=='exportProperty'">
+		        <div class="panel panel-success">
+					<div class="panel-heading">
+						<h3 class="panel-title">Exportar archivos de configuración para aplicación cliente</h3>
+					</div>
+					<div class="panel-body">
+						<p>
+							Archivo de configuración
+							<select data-ng-model="main.data.other.export.file.type">
+								<option value="PropertyJMigrator">Migrar</option>
+								<option value="PropertyJFind">Buscar</option>
+								<option value="PropertyJDelete">Eliminar</option>
+							</select>
+						</p>
+						<p>
+							Content Manager Maestro
+							<select data-ng-model="main.data.other.export.file.master" data-ng-options="connection.conf.name for connection in main.data.connections">
+							</select>
+						</p>
+						<p data-ng-show="main.data.other.export.file.master!=null">
+							Item type
+							<select data-ng-model="main.data.other.export.file.itemtype" data-ng-options="entities.name for entities in main.data.other.export.file.master.entities">
+							</select>
+						</p>
+						<p data-ng-show="main.data.other.export.file.type=='PropertyJMigrator'">
+							Content Manager Esclavo
+							<select data-ng-model="main.data.other.export.file.slave" data-ng-options="connection.conf.name for connection in main.data.connections">
+							</select>
+						</p>
+						<hr>
+						<button class="btn btn-xs btn-info" data-ng-click="main.methods.export(main.data.other.export.file,'property')">Descargar</button>
+					</div>
+				</div>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+	
+		<!-- PRINCIPAL JAVASCRIPT PLUG -->
+		<script src="asset/plug/js/jquery.js"></script>
+		<script src="asset/plug/js/angular.min.js"></script>
+		<script src="asset/plug/js/bootstrap.min.js"></script>
+		<script src="asset/plug/treeview/angular.treeview.js"></script>
+                <!-- OTHER JAVASCRIPT PLUG -->
+		<script src="asset/plug/js/angular.fileupload.js"></script>
+		<script src="asset/plug/js/jquery.canvasjs.min.js"></script>
+		<script src="asset/plug/js/filesaver.js"></script>
+		<!-- OWNER CODE -->
+		<script src="asset/js/http.js"></script>
+		<script src="asset/js/script.js"></script>
+	</body>
+</html>

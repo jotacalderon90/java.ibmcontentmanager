@@ -1,0 +1,1 @@
+..\..\_java\bin\java -jar ..\..\cl.jotacalderon.contentmanager-1.0.jar clientApp

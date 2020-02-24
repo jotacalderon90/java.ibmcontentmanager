@@ -1,0 +1,30 @@
+#dvMessage{
+	position:fixed;
+	bottom:0;
+	right:0;
+	margin-right:10px;
+	width:50%;
+	z-index:1000;
+}
+.panel{
+	font-size: 12px;
+}
+.panel h3{
+	float:left;
+}
+.panel-heading{
+	height:38px;
+}
+#chartContainer{
+	min-height:400px;
+}
+.files a{
+	cursor:pointer;
+}
+#myModal .modal-body{
+	min-width:600px;
+}
+#myModal .modal-body object{
+	min-width:100%;
+	min-height:400px;
+}
